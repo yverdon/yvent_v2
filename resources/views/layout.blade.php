@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="{{ url('/') }}/_asset/favicon.png">
+
+    <title>YVENT - {{ $page_title or ''}}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url('_asset/css') }}/style.css" rel="stylesheet">
+    <link href="{{ url('_asset/css') }}/daterangepicker.css" rel="stylesheet">
+    <link href="{{ url('_asset/fullcalendar-3.1.0') }}/fullcalendar.min.css" rel="stylesheet">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ url('/') }}"><i class="fa fa-calendar"></i> YVENT</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <!-- Authentication Links -->
+            <?php //@if (Auth::guest()) ?>
+            @if (Auth::guest())
+                <!--<li><a href="{{ url('/register') }}"><i class="fa fa-user-plus"></i> Enregistrement</a></li>-->
+                <!--<li><a href="{{ url('/login') }}"><i class="fa fa-sign-in"></i> Connexion</a></li>-->
+            @else
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <i class="fa fa-list-ul"></i> Listes <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        @foreach (Auth::user()->eventtypesReadable() as $eventtype)
+                            @if ($eventtype->id == 4)
+                                <li><a href="{{ url('chantiers/') }}">{{ $eventtype->namePluralWithLabel() }} (tous)</a></li>
+                                @php
+                                    $services = App\Service::whereHas('events',function($query) use ($eventtype) {
+                                        $query->whereHas('eventtype',function($query) use ($eventtype) {
+                                            $query->where([['id','=',$eventtype->id]]);
+                                        });
+                                    })->orderBy('name')->get();
+                                @endphp
+                                @foreach ($services as $service)
+                                    <li><a href="{{ url('chantiers/' . $service->id) }}">{{ $eventtype->namePluralWithLabel() }} {{ $service->name }}</a></li>
+                                @endforeach
+                                <li><a href="{{ url('chantiers/aggloy') }}">{{ $eventtype->namePluralWithLabel() }} (AggloY)</a></li>
+                            @else
+                                <li><a href="{{ url('events/' . $eventtype->id . '/all') }}">{{ $eventtype->namePluralWithLabel() }}</a></li>
+                                <li><a href="{{ url('events/' . $eventtype->id . '/old') }}">{{ $eventtype->namePluralWithLabel() }} (anciens)</a></li>
+                            @endif
+                            <li role="separator" class="divider"></li>
+                        @endforeach
+                        <li><a href="{{ url('pi/') }}">💳 Plan des investissements</a></li>
+                        <li role="separator" class="divider"></li>
+                    </ul>
+                </li>
+                @if (Auth::user()->isEditor())
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            <i class="fa fa-calendar-plus-o"></i> Ajouter <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            @foreach(Auth::user()->eventtypesWriteable() as $eventtype)
+                                <li><a href="{{ url('events/create/' . $eventtype->id) }}">{{ $eventtype->nameWithLabel() }}</a></li>
+                            @endforeach
+                        </ul>
+                    </li>
+                @endif
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <i class="fa fa-user"></i> {{ Auth::user()->username }}{{-- ({{ Auth::user()->role_rel->description }})--}} <span class="caret"></span>
+                    </a>
+
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a href="{{ url('/logout') }}"
+                                onclick="event.preventDefault();
+                                         document.getElementById('logout-form').submit();">
+                                Se déconnecter
+                            </a>
+
+                            <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                        </li>
+                        @if (Auth::user()->isAdmin())
+                            <!--<li><a href="{{ url('/register') }}"><i class="fa fa-user-plus"></i> Ajouter un utilisateur</a></li>-->
+                        @endif
+                    </ul>
+                </li>
+            @endif
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    
+    <div class="container">
+
+        @yield('content')
+        
+    </div> <!-- /container -->
+
+    <footer class="footer">
+        <p>Cette application a été réalisée par <a href="http://www.yverdon-les-bains.ch/prestations-deladministration/informatique/sit/">SIT Yverdon</a> à l'aide de <a href="https://laravel.com/">Laravel</a>, <a href="http://getbootstrap.com/">Bootstrap</a> et <a href="https://fullcalendar.io/">FullCalendar</a>.</p>
+    </footer>
+    
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js" integrity="sha384-VjEeINv9OSwtWFLAtmc4JCtEJXXBub00gtSnszmspDLCtC0I4z4nqz7rEFbIZLLU" crossorigin="anonymous"></script>-->
+    <script src="{{ url('_asset/fullcalendar/lib') }}/moment.min.js"></script>
+        
+    
+    @yield('js')
+    
+  </body>
+</html>

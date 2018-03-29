@@ -1,0 +1,126 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  padding-top: 80px;
+  padding-bottom: 20px;
+  margin-bottom: 150px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin-top: 60px;
+  padding: 40px 0;
+  color: #999;
+  text-align: center;
+  background-color: #dddddd;
+  border-top: 1px solid #e5e5e5;
+}
+.footer p:last-child {
+  margin-bottom: 0;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 960px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+#calendar {
+	margin: 0 auto;
+}
+
+.row {
+    padding: 5px 3px;
+    margin-bottom: 5px;
+    #background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+a:-webkit-any-link{
+text-decoration:none;
+}
+
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}
+
+.popover{
+    max-width: 800px; /* Max Width of the popover (depending on the container!) */
+}
+
+.breadcrumb {
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    list-style: none;
+    background-color: #dddddd;
+    border-radius: 4px;
+}
+
+.fc-unthemed .fc-today {
+    background: #D1E2F6 !important;
+}
+
+.fc-unthemed .fc-list-empty {
+    background-color: #dddddd !important;
+}
+
+.fc-sat, .fc-sun { background-color: #fbfbfb; }
+
+/* body { 
+    background: url(../fond4.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+} */
+
+.label-default {
+    background-color: #aaa;
+}
+
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('../ajax-loader.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+.loading {
+    display:    block;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
