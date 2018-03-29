@@ -21,7 +21,7 @@ class SlotController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->middleware('auth',           ['except' => ['ical']]);
         $this->middleware('reader',         ['except' => ['ical']]);
@@ -29,7 +29,7 @@ class SlotController extends Controller
         $this->middleware('key',            ['only' => ['ical']]);
         $this->middleware('relation.slot',       ['only' => ['edit']]);
     }
-    
+
     public function index()
     {
         //
@@ -44,14 +44,14 @@ class SlotController extends Controller
     {
         $count = $event->slots->count() + 1;
         $slottypes = $event->Eventtype->Slottypes->pluck('name','id');
-        
+
         $data = [
             'page_title'        => 'Ajouter un horaire (' . $count . ')',
             'slottypes'         => $slottypes,
             'event'             => $event,
             'insert'            => true
         ];
-        
+
         // return redirect('events/' . $event->id . '/slots/create');
         return view('slot/edit2', $data);
     }
@@ -70,7 +70,7 @@ class SlotController extends Controller
             'slottype_id'=> 'required',
         ]);
         $time = explode(" - ", $request->input('time'));
-        
+
         $slot                          = new Slot;
         $slot->event_id                = $event->id;
         $slot->start_time              = $this->change_date_format($time[0]);
@@ -78,7 +78,7 @@ class SlotController extends Controller
         $slot->location                = $request->input('location');
         $slot->slottype_id             = $request->input('slottype_id');
         $slot->save();
-        
+
         $request->session()->flash('success', 'Le nouvel horaire a été enregistré !');
         return redirect('events/' . $event->id . '/edit');
     }
@@ -105,7 +105,7 @@ class SlotController extends Controller
         $slot->start_time =  $this->change_date_format_fullcalendar($slot->start_time);
         $slot->end_time =  $this->change_date_format_fullcalendar($slot->end_time);
         $slottypes = $event->Eventtype->Slottypes->pluck('name','id');
-        
+
         $data = [
             'page_title'        => 'Édition horaire',
             'slottypes'         => $slottypes,
@@ -113,7 +113,7 @@ class SlotController extends Controller
             'insert'            => false,
             'slot'              => $slot
         ];
-        
+
         return view('slot/edit2', $data);
     }
 
@@ -133,13 +133,13 @@ class SlotController extends Controller
         ]);
 
         $time = explode(" - ", $request->input('time'));
-        
+
         $slot->start_time              = $this->change_date_format($time[0]);
         $slot->end_time                = $this->change_date_format($time[1]);
         $slot->location                = $request->input('location');
         $slot->slottype_id             = $request->input('slottype_id');
         $slot->save();
-        
+
         $request->session()->flash('success', 'L\'horaire a été mis à jour !');
         return redirect('events/' . $event->id . '/edit');
     }
@@ -153,13 +153,13 @@ class SlotController extends Controller
     public function destroy(Event $event, Slot $slot)
     {
         $slot->delete();
-        
+
         return redirect('events/' . $event->id . '/edit');
     }
-    
+
     /**
      * Fetches the slots from database and performs some fomatting.
-     * 
+     *
      * @param  \Illuminate\Http\Request  $eventtype
      * @return \Illuminate\Http\Response
      */
@@ -179,16 +179,16 @@ class SlotController extends Controller
 
         foreach($slots as $slot)
         {
-            $slot->title = ($slot->event->eventtype->label <> '' ? $slot->event->eventtype->label . ' ' : '') 
-                                . $slot->event->title 
-                                . ' - ' 
+            $slot->title = ($slot->event->eventtype->label <> '' ? $slot->event->eventtype->label . ' ' : '')
+                                . $slot->event->title
+                                . ' - '
                                 . $slot->location
                                 . ($slot->event->status->label <> '' ? ' - ' . $slot->event->status->label : '')
                                 . ($slot->slottype->label <> '' ? ' - ' . $slot->slottype->label : '');
             $slot->url = url('events/' . $slot->event->id);
             $slot->start = $slot->start_time;
             $slot->end = $slot->end_time;
-            
+
             $slot->backgroundColor = $slot->color1();
             $slot->borderColor = $slot->color2();
             $slot->textColor = $slot->color3();
@@ -196,13 +196,12 @@ class SlotController extends Controller
         Log::info(get_class($this) . ' : DATA SENT TO THE VIEW');
         return $slots;
     }
-    
+
     public function ical($key,$username)
     {
-        // $keys = User::orderBy('id')->get();
-        // $username = Route::current()->getParameter('username');
+      
         $eventtypes = User::where('username','=',$username)->firstOrFail()->eventtypesReadable()->pluck('id');
-        
+
         $slots = Slot::whereHas('event', function($query) use ($eventtypes) {
                             $query->whereHas('eventtype', function($query) use ($eventtypes) {
                                 $query->whereIn('id', $eventtypes);
@@ -227,31 +226,31 @@ class SlotController extends Controller
         header('Content-Disposition: attachment; filename="yvent_'. $username .'.ics"');
         return $vCalendar->render();
     }
-    
+
     public function change_date_format($date)
     {
         $time = DateTime::createFromFormat('d/m/Y H:i:s', $date);
         return $time->format('Y-m-d H:i:s');
     }
-    
+
     public function change_date_format2($date)
     {
         $time = DateTime::createFromFormat('d/m/Y', $date);
         return $time->format('Y-m-d');
     }
-    
+
     public function change_date_format_fullcalendar($date)
     {
         $time = DateTime::createFromFormat('Y-m-d H:i:s', $date);
         return $time->format('d/m/Y H:i:s');
     }
-    
+
     public function change_date_format_fullcalendar2($date)
     {
         $time = DateTime::createFromFormat('Y-m-d', $date);
         return $time->format('d/m/Y');
     }
-    
+
     public function format_interval(\DateInterval $interval)
     {
         $result = "";
@@ -261,7 +260,7 @@ class SlotController extends Controller
         if ($interval->h) { $result .= $interval->format("%h heure(s) "); }
         if ($interval->i) { $result .= $interval->format("%i minute(s) "); }
         if ($interval->s) { $result .= $interval->format("%s seconde(s) "); }
-        
+
         return $result;
     }
 }

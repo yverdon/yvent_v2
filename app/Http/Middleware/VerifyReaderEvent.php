@@ -19,11 +19,9 @@ class VerifyReaderEvent
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        $eventtype_id = ($request->route()->getParameter('event')->eventtype->id);
-        // $eventtypes_list = Auth::user()->eventtypesWriteable()->pluck('id')->toArray();
-        
+        $eventtype_id = ($request->route()->parameter('event')->eventtype->id);
+
         if (Auth::guard($guard)->check()) {
-            // if (in_array($eventtype_id, $eventtypes_list))
             if (Auth::user()->isEventReader($eventtype_id))
             {
                 return $next($request);

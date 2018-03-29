@@ -17,9 +17,9 @@ class VerifyKey
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {     
-        $key_user = User::where('key',$request->route()->getParameter('key'))->first()->username;
-        $username = $request->route()->getParameter('username');
+    {
+        $key_user = User::where('key',$request->route()->parameter('key'))->first()->username;
+        $username = $request->route()->parameter('username');
 
         if ($key_user == $username) {
                 return $next($request);

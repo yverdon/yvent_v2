@@ -19,8 +19,8 @@ class VerifyDocumentRelation
      */
     public function handle($request, Closure $next)
     {
-        $document_eventid = ($request->route()->getParameter('document')->event->id);
-        $eventid = ($request->route()->getParameter('event')->id);
+        $document_eventid = ($request->route()->parameter('document')->event->id);
+        $eventid = ($request->route()->parameter('event')->id);
 
         if ($document_eventid == $eventid) {
                 return $next($request);

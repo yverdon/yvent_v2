@@ -23,7 +23,6 @@
     Votre événement n'a pas d'horaire.
 @else
     @foreach ( $event->slots->sortBy('start_time') as $slot )
-        <!--<li><a href="{{ route('events.slots.show', [$event->id, $slot->id]) }}">{{ $slot->location }}</a></li>-->
         <div class="row" style="color:{{ $slot->color3() }}; border-style: solid; border-width: 1px; border-color: {{ $slot->color2() }}; background-color: {{ $slot->color1() }};;">
         <div class="col-lg-2">
             {{ $slot->slottype->name }}

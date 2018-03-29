@@ -19,8 +19,8 @@ class VerifyLogRelation
      */
     public function handle($request, Closure $next)
     {
-        $log_eventid = ($request->route()->getParameter('log')->event->id);
-        $eventid = ($request->route()->getParameter('event')->id);
+        $log_eventid = ($request->route()->parameter('log')->event->id);
+        $eventid = ($request->route()->parameter('event')->id);
 
         if ($log_eventid == $eventid) {
                 return $next($request);

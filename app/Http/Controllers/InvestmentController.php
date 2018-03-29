@@ -13,22 +13,22 @@ class InvestmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->middleware('auth');
         $this->middleware('reader');
     }
-    
+
     public function index()
     {
         $investments = Investment::get()->sortBy('id');
         $page_title = 'Plan des investissements';
-        
+
         $data = [
             'page_title'                => $page_title,
-            'investments'               => $investments, 
+            'investments'               => $investments,
             ];
-        
+
         return view('investment/list', $data);
     }
 

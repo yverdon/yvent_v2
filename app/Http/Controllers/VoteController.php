@@ -27,7 +27,7 @@ class VoteController extends Controller
             'page_title'        => 'Logo GeoMapFish',
             'insert'            => true
         ];
-        
+
         return view('vote/create', $data);
     }
 

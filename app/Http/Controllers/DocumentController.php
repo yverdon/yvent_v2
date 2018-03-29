@@ -20,14 +20,14 @@ class DocumentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->middleware('auth');
         $this->middleware('reader');
         $this->middleware('editor.event',       ['only' => ['create','store','edit','update','destroy']]);
         $this->middleware('relation.document',  ['only' => ['edit']]);
     }
-    
+
     public function index()
     {
         //
@@ -41,14 +41,13 @@ class DocumentController extends Controller
     public function create(Event $event)
     {
         $count = $event->documents->count() + 1;
-        
+
         $data = [
             'page_title'        => 'Ajouter un document (' . $count . ')',
             'event'             => $event,
             'insert'            => true
         ];
-        
-        // return redirect('events/' . $event->id . '/slots/create');
+
         return view('document/edit2', $data);
     }
 
@@ -63,7 +62,7 @@ class DocumentController extends Controller
         $this->validate($request, [
             'file' => 'file|mimes:jpg,doc,docx,pdf|max:5120'
         ]);
-        
+
         $document                    = new Document;
         $document->event_id         = $event->id;
         $document->filename         = $request->file('image')->getClientOriginalName();
@@ -71,7 +70,7 @@ class DocumentController extends Controller
         $document->mime             = $request->file('image')->getMimeType();
         $document->size             = $request->file('image')->getSize();
         $document->save();
-        
+
         $request->session()->flash('success', 'Le nouveau document a été enregistré !');
         return redirect('events/' . $event->id . '/edit');
     }
@@ -94,13 +93,13 @@ class DocumentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(Event $event, Document $document)
-    {       
+    {
         $data = [
             'page_title'        => 'Édition document',
             'insert'            => false,
             'document'          => $document
         ];
-        
+
         return view('document/edit2', $data);
     }
 
@@ -116,13 +115,13 @@ class DocumentController extends Controller
         $this->validate($request, [
             'file' => 'file|mimes:jpg,doc,docx,pdf|max:5120'
         ]);
-    
+
         $document->filename         = $request->file('image')->getClientOriginalName();
         $document->data             = base64_encode(file_get_contents($request->file('image')->getRealPath()));
         $document->mime             = $request->file('image')->getMimeType();
         $document->size             = $request->file('image')->getSize();
         $document->save();
-        
+
         $request->session()->flash('success', 'Le document a été mis à jour !');
         return redirect('events/' . $event->id . '/edit');
     }
@@ -136,16 +135,16 @@ class DocumentController extends Controller
     public function destroy(Event $event, Document $document)
     {
         $document->delete();
-        
+
         return redirect('events/' . $event->id . '/edit');
     }
-    
+
     public function doc($id)
     {
         $content    = base64_decode(Document::find($id)->data);
         $type       = Document::find($id)->mime;
         $filename   = Document::find($id)->filename;
-        
+
         return response($content)
             ->header('Content-Type', $type)
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');

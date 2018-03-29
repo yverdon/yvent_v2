@@ -26,7 +26,7 @@ class EventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct() 
+    public function __construct()
     {
         $this->middleware('auth');
         $this->middleware('reader');
@@ -34,28 +34,25 @@ class EventController extends Controller
         $this->middleware('editor',         ['only' => ['create','store']]);
         $this->middleware('editor.event',   ['only' => ['edit','update','destroy']]);
     }
-    
+
     // Liste des événements
     public function index($eventtype,$listtype)
-    {   
-        // $events = Event::with('startingDate')->where('eventtype_id','=',$eventtype)->get()->sortBy('starting_date');
+    {
         $events = Event::where('eventtype_id','=',$eventtype)->get()->sortBy('starting_date');
-        
+
         $events2 = DB::table('events')
             ->select('events.*')
             ->leftJoin('slots', 'events.id', '=', 'slots.event_id')
             ->addSelect(DB::raw('MIN(slots.start_time) as starting_date'))
             ->groupBy('events.id')
             ->orderBy('starting_date', 'asc')
-            // ->get();
             ->paginate(10);
-        
+
         foreach($events as $event)
         {
-            // $event->startDate = $event->getStartingDate();
-            // $event->endDate = $event->getEndingDate();
+
             $event->project = $event->status->project;
-            
+
             $event->slotsByType = DB::table('slots')
                  ->join('slottypes', 'slottype_id', '=', 'slottypes.id')
                  ->where('event_id','=',$event->id)
@@ -67,16 +64,12 @@ class EventController extends Controller
         if ($listtype == 'old') {
             $events = $events->where('ending_date','<',date("Y-m-d H:i:s"));
             $page_title = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel() . ' (anciens)';
-            // $page_title = 'Liste: ' . Eventtype::find($eventtype)->name_plural . ' (anciens)';
-            // $page_title_with_label = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel() . ' (anciens)';
         }
         else {
             $events = $events->where('ending_date','>=',date("Y-m-d H:i:s"));
             $page_title = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel();
-            // $page_title = 'Liste: ' . Eventtype::find($eventtype)->name_plural;
-            // $page_title_with_label = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel();
         }
-        
+
         //Custom Pagination
         //Get current page form url e.g. &page=6
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -92,54 +85,50 @@ class EventController extends Controller
 
         //Create our paginator and pass it to the view
         $paginatedSearchResults= new LengthAwarePaginator($currentPageSearchResults, count($collection), $perPage);
-        
+
         $data = [
             'page_title'                => $page_title,
             // 'page_title_with_label'     => $page_title_with_label,
-            'events'                    => $paginatedSearchResults, 
+            'events'                    => $paginatedSearchResults,
             ];
-        
+
         return view('event/list', $data);
     }
-      
+
     // Liste des chantiers
     public function index_works($service = null)
-    {   
+    {
         $eventtype = 4;
-        
+
         if (!is_null($service)) {
-            // $events = Event::with('startingDate')->where('eventtype_id','=',$eventtype)->where('service_id','=',$service)->get();
             $events = Event::where('eventtype_id','=',$eventtype)->where('service_id','=',$service)->get();
             $page_title = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel() . ' ' . Service::find($service)->name;
         }
         else {
-            // $events = Event::with('startingDate')->where('eventtype_id','=',$eventtype)->get();
             $events = Event::where('eventtype_id','=',$eventtype)->get();
             $page_title = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel();
         }
-        
+
         foreach($events as $event)
         {
-            // $event->startDate = $event->getStartingDate();
-            // $event->endDate = $event->getEndingDate();
             $event->project = $event->status->project;
         }
 
         $events = $events->sortBy(function($event) { return $event->service->name .'-'. $event->status->idx .'-'. (is_Null($event->starting_date) ? 9999 : $event->starting_date) .'-'. $event->title; } );
-        
+
         $data = [
             'page_title'    => $page_title,
-            'events'        => $events, 
+            'events'        => $events,
             ];
-        
+
         return view('event/list_works', $data);
     }
-    
+
     // Liste des chantiers en lien avec l'AggloY
     public function index_works_aggloy($service = null)
-    {   
+    {
         $eventtype = 4;
-        
+
         if (!is_null($service)) {
             $events = Event::where(function ($query) use ($eventtype) {
                 $query  ->where('eventtype_id','=',$eventtype)
@@ -152,29 +141,27 @@ class EventController extends Controller
             $events = Event::where('eventtype_id','=',$eventtype)->whereNotNull('aggloy')->orWhereNotNull('aggloy4')->get();
             $page_title = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel() . ' (en lien avec AggloY)';
         }
-        
+
         foreach($events as $event)
         {
-            // $event->startDate = $event->getStartingDate();
-            // $event->endDate = $event->getEndingDate();
             $event->project = $event->status->project;
         }
 
         $events = $events->sortBy(function($event) { return $event->service->name .'-'. $event->status->idx .'-'. (is_Null($event->starting_date) ? 9999 : $event->starting_date) .'-'. $event->title; } );
-        
+
         $data = [
             'page_title'    => $page_title,
-            'events'        => $events, 
+            'events'        => $events,
             ];
-        
+
         return view('event/list_works_aggloy', $data);
     }
-    
+
     // Liste des chantiers PDF
     public function index_works_pdf($eventtype = 4)
-    {   
+    {
         $events = Event::with('startingDate')->where('eventtype_id','=',$eventtype)->get();
-        
+
         foreach($events as $event)
         {
             $event->startDate = $event->getStartingDate();
@@ -184,17 +171,16 @@ class EventController extends Controller
 
         $events = $events->sortBy(function($event) { return $event->service->name .'-'. $event->status->idx .'-'. $event->title; } );
         $page_title = 'Liste: ' . Eventtype::find($eventtype)->name_plural;
-        
+
         $data = [
             'page_title'    => $page_title,
-            'events'        => $events, 
+            'events'        => $events,
             ];
-        
-        // return view('event/list_works', $data);
-        
+
+
         $view = \View::make('event/list_works_pdf', $data);
         $html = $view->render();
-        
+
         PDF::SetTitle('Hello World');
         PDF::AddPage();
         PDF::writeHTML($html, true, false, true, false, '');
@@ -208,7 +194,7 @@ class EventController extends Controller
      */
     // Ajouter un événement
     public function create($eventtype = 2)
-    {     
+    {
         $data = [
             'page_title'        => 'Ajouter: ' . Eventtype::find($eventtype)->name,
             'services'          => Eventtype::find($eventtype)->Services->pluck('name','id'),
@@ -217,7 +203,7 @@ class EventController extends Controller
             'eventtype'         => Eventtype::find($eventtype),
             'insert'            => true
         ];
-        
+
         return view('event/edit2', $data);
     }
 
@@ -240,7 +226,7 @@ class EventController extends Controller
             'commune_id'=> 'required',
             'aggloy_amount'=> 'integer',
         ]);
-        
+
         $event                          = new Event;
         $event->eventtype_id            = $request->input('eventtype_id');
         $event->title                   = $request->input('title');
@@ -260,7 +246,7 @@ class EventController extends Controller
         $event->service_id              = $request->input('service_id');
         $event->commune_id              = $request->input('commune_id');
         $event->save();
-        
+
         $request->session()->flash('success', 'Le nouvel événement a été enregistré !');
         // return redirect('events/create');
         return redirect('events/' . $event->id . '/edit');
@@ -277,13 +263,12 @@ class EventController extends Controller
     {
         $event->announcement_date =  $this->change_date_format_fullcalendar2($event->announcement_date);
         $event->decision_date = $this->change_date_format_fullcalendar2($event->decision_date);
-        // $event->comment = nl2br($event->comment);
 
         $data = [
             'page_title'     => $event->title . ' (' . $event->eventtype->name . ')',
             'event'          => $event,
         ];
-        
+
         return view('event/view', $data);
     }
 
@@ -298,9 +283,7 @@ class EventController extends Controller
     {
         $event->announcement_date =  $this->change_date_format_fullcalendar2($event->announcement_date);
         $event->decision_date =  $this->change_date_format_fullcalendar2($event->decision_date);
-        // print $event->eventtype->status->pluck('name','id');
-        
-        
+
         $data = [
             'page_title'        => 'Édition: '. $event->title . ' (' . $event->eventtype->name . ')',
             'services'          => $event->eventtype->services->pluck('name','id'),
@@ -311,7 +294,7 @@ class EventController extends Controller
             'insert'            => false,
             'event'             => $event
         ];
-        
+
         return view('event/edit2', $data);
     }
 
@@ -336,7 +319,7 @@ class EventController extends Controller
             'commune_id'=> 'required',
             'aggloy_amount'=> 'integer',
         ]);
-        
+
         $event->eventtype_id            = $request->input('eventtype_id');
         $event->title                   = $request->input('title');
         $event->organisation            = $request->input('organisation');
@@ -354,12 +337,10 @@ class EventController extends Controller
         $event->decision_date           = $this->change_date_format2($request->input('decision_date'));
         $event->service_id              = $request->input('service_id');
         $event->commune_id              = $request->input('commune_id');
-        // $event->file                    = pg_escape_bytea(file_get_contents($request->file('image')->getRealPath()));
         $event->save();
-        
+
         $request->session()->flash('success', 'L\'événement a été mis à jour !');
-        // $request->session()->flash('success', $request->file('image')->getClientOriginalName());
-        
+
         return redirect('events/' . $event->id);
     }
 
@@ -373,11 +354,11 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         $event->delete();
-        
+
         return redirect('events/' . $event->eventtype_id . '/old');
     }
-    
-    
+
+
     public function getdata($term)
     {
         $data = array(
@@ -398,14 +379,14 @@ class EventController extends Controller
         }
         return Response::json($return_array);
     }
-    
-    
+
+
     public function change_date_format($date)
     {
         $time = DateTime::createFromFormat('d/m/Y H:i:s', $date);
         return $time->format('Y-m-d H:i:s');
     }
-    
+
     public function change_date_format2($date)
     {
         if ($date) {
@@ -413,13 +394,13 @@ class EventController extends Controller
             return $time->format('Y-m-d');
         }
     }
-    
+
     public function change_date_format_fullcalendar($date)
     {
         $time = DateTime::createFromFormat('Y-m-d H:i:s', $date);
         return $time->format('d/m/Y H:i:s');
     }
-    
+
     public function change_date_format_fullcalendar2($date)
     {
         if ($date) {
@@ -427,7 +408,7 @@ class EventController extends Controller
             return $time->format('d/m/Y');
         }
     }
-    
+
     public function format_interval(\DateInterval $interval)
     {
         $result = "";
@@ -437,7 +418,7 @@ class EventController extends Controller
         if ($interval->h) { $result .= $interval->format("%h heure(s) "); }
         if ($interval->i) { $result .= $interval->format("%i minute(s) "); }
         if ($interval->s) { $result .= $interval->format("%s seconde(s) "); }
-        
+
         return $result;
     }
 }

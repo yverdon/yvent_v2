@@ -19,8 +19,8 @@ class VerifySlotRelation
      */
     public function handle($request, Closure $next)
     {
-        $slot_eventid = ($request->route()->getParameter('slot')->event->id);
-        $eventid = ($request->route()->getParameter('event')->id);
+        $slot_eventid = ($request->route()->parameter('slot')->event->id);
+        $eventid = ($request->route()->parameter('event')->id);
 
         if ($slot_eventid == $eventid) {
                 return $next($request);
