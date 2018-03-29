@@ -54,7 +54,9 @@ class Event extends Model
 
     public function investments()
     {
-        return $this->belongsToMany('App\Investment');
+        // return $this->belongsToMany('App\Investment');
+        return $this->belongsToMany('App\Investment', 'event_investment', 'investment_id', 'investment_id');
+
     }
 
     public function getStartingDateAttribute($value)

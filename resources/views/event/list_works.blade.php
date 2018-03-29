@@ -67,8 +67,6 @@
                         <td><span class="label label-default" style="background-color: {{ $event->Status->color1 }}; color: {{ $event->Status->color3 }};">{{ strftime("%d.%m.%Y", strtotime($event->slots->min('start_time'))) }}</span></td>
                         <td><span class="label label-default" style="background-color: {{ $event->Status->color1 }}; color: {{ $event->Status->color3 }};">{{ strftime("%d.%m.%Y", strtotime($event->slots->max('end_time'))) }}</span></td>
                     @endif
-                    <!--<td>{{-- strftime("%d/%m/%Y, %H:%M", strtotime($event->start_time)) --}}</td>
-                    <td>{{-- date("d/m/Y\, G:i", strtotime($event->end_time)) --}}</td>-->
                     <td>{{ $event->contact_name }}</td>
                     <td>
                         @if(count($event->partners))

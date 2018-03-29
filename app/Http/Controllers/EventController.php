@@ -99,7 +99,6 @@ class EventController extends Controller
     public function index_works($service = null)
     {
         $eventtype = 4;
-
         if (!is_null($service)) {
             $events = Event::where('eventtype_id','=',$eventtype)->where('service_id','=',$service)->get();
             $page_title = 'Liste: ' . Eventtype::find($eventtype)->namePluralWithLabel() . ' ' . Service::find($service)->name;
@@ -116,11 +115,11 @@ class EventController extends Controller
 
         $events = $events->sortBy(function($event) { return $event->service->name .'-'. $event->status->idx .'-'. (is_Null($event->starting_date) ? 9999 : $event->starting_date) .'-'. $event->title; } );
 
+
         $data = [
             'page_title'    => $page_title,
             'events'        => $events,
             ];
-
         return view('event/list_works', $data);
     }
 
