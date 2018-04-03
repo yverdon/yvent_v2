@@ -10,6 +10,7 @@ class Investment extends Model
 
     public function events()
     {
-        return $this->belongsToMany('App\Event');
+        return $this->belongsToMany('App\Event', 'event_investment', 'event_id', 'investment_id');
+
     }
 }

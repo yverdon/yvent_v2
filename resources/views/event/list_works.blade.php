@@ -76,7 +76,7 @@
                         @endif
                     </td>
                     <td>
-                        @if(count($event->investments))
+                        @if(!is_null($event->investments))
                             @foreach ($event->investments->sortBy("numero") as $investment)
                                 <a href="{{ url('pi#') }}{{ $investment->numero }}">
                                     <span class="label label-default" style="background-color: #AAAAAA; color: #FFFFFF;">PI {{ $investment->numero }}</span>
@@ -85,7 +85,7 @@
                         @endif
                     </td>
                     <td>
-                        @if (count($event->surface))
+                        @if (!is_null($event->surface))
                             <a data-toggle="tooltip" data-placement="top" title="Carte" href="/main/wsgi/theme/cctech?wfs_layer=CCTECH_travaux_surface&wfs_id={{ $event->surface->id }}&baselayer_opacity=100&baselayer_ref=asitvd.fond_gris" target="_blank" class="btn btn-sm btn-default">
                                 <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
                             </a>

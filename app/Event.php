@@ -44,7 +44,7 @@ class Event extends Model
 
     public function surface()
     {
-        return $this->hasOne('App\Surface');
+        return $this->hasOne('App\Surface', 'event_id', 'id');
     }
 
     public function partners()
@@ -54,8 +54,7 @@ class Event extends Model
 
     public function investments()
     {
-        // return $this->belongsToMany('App\Investment');
-        return $this->belongsToMany('App\Investment', 'event_investment', 'investment_id', 'investment_id');
+        return $this->belongsToMany('App\Investment', 'event_investment', 'event_id', 'investment_id');
 
     }
 

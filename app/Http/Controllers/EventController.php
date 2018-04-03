@@ -112,14 +112,13 @@ class EventController extends Controller
         {
             $event->project = $event->status->project;
         }
-
         $events = $events->sortBy(function($event) { return $event->service->name .'-'. $event->status->idx .'-'. (is_Null($event->starting_date) ? 9999 : $event->starting_date) .'-'. $event->title; } );
-
 
         $data = [
             'page_title'    => $page_title,
             'events'        => $events,
             ];
+
         return view('event/list_works', $data);
     }
 
