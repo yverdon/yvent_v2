@@ -8,7 +8,20 @@
             <li class="active">Vous êtes ici: {{ $page_title }}</li>
         </ol>
     </div>
+    <div id="fulltextSearch">
+      <div class="ui-widget">
+        <label for="event">Mot-clef: </label>
+        <input id="event">
+        <div class="ui-widget" style="margin-top:2em; font-family:Arial">
+      Result:
+      <div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
+    </div>
+      <div id="eventSearchResult" style="width:300px,height:200px;background-color:blue">
+          toto
+      </div>
+    </div>
 </div>
+
 <h1>{{ $page_title }}</h1>
 
 <div class="row">
@@ -16,6 +29,8 @@
         <div id='calendar'></div>
     </div>
 </div>
+
+
 
 <!-- Fullcalendar Event filtering -->
 <div class="row">
@@ -59,7 +74,7 @@
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/fullcalendar.min.js"></script>
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/locale-all.js"></script>
 <script type="text/javascript">
-    
+
     //Fullcalendar Event filtering
     var curSource = new Array();
     //sources definition
@@ -67,7 +82,7 @@
         curSource[{{ $eventtypeid }}] = '{{ url('/') }}/api2/{{ $eventtypeid }}';
     @endforeach
     var newSource = new Array(); //we'll use this later
-    
+
     function calAspectRatio() {
         if ($(window).width() > 480) {
             return 1.35;
@@ -76,7 +91,7 @@
             return 1;
         }
     }
-    
+
     // Fullcalendar Event filtering, calendar refresh
     function calEventFilter() {
         //get current status of our filters into newSource
@@ -98,11 +113,11 @@
             curSource[{{ $eventtypeid }}] = newSource[{{ $eventtypeid }}];
         @endforeach
     }
-    
+
     $(document).ready(function() {
-        
+
         var base_url = '{{ url('/') }}';
-        
+
         // keep history : set default values
         var today = new Date();
         var tmpYear = today.getFullYear();
@@ -117,7 +132,7 @@
           if (vars[i].match("^day")) tmpDay = vars[i].substring(4);
           if (vars[i].match("^view")) tmpView = vars[i].substring(5);
         }
-        
+
         if ($(window).width() > 480) {
             calViews = 'month,listWeek,listMonth,listYear';
             calViewsTitles = {
@@ -135,7 +150,7 @@
                 listMonth: { buttonText: 'Mois' },
             }
         }
-        
+
         $('#calendar').fullCalendar({
             weekends: true,
             header: {
@@ -152,9 +167,9 @@
             locale: 'fr',
             aspectRatio: calAspectRatio(),
             eventLimit: true, // allow "more" link when too many events
-            
+
             eventSources: [],
-            
+
             eventMouseover: function(calEvent, jsEvent) {
                 var startDate = calEvent.start.format('ddd DD.MM.YYYY HH:mm');
                 var endDate = calEvent.end.format('ddd DD.MM.YYYY HH:mm');
@@ -175,7 +190,7 @@
                 $(this).css('z-index', 8);
                 $('.tooltipevent').remove();
             },
-            
+
             loading: function(isLoading, view) {
                 if (isLoading) {// isLoading gives boolean value
                     $("#loading").addClass("loading");
@@ -183,7 +198,7 @@
                     $("#loading").removeClass("loading");
                 }
             },
-            
+
             // keep history : set calendar options before displaying
             year: tmpYear,
             month: tmpMonth,
@@ -196,9 +211,9 @@
                         ) + '&day=' + moment.format('DD') + '&view=' + view.name;
                 }
             }
-            
+
         });
-        
+
         // keep history
         var date = new Date(tmpYear, tmpMonth, tmpDay, 0, 0, 0);
         var moment = $('#calendar').fullCalendar('getDate');
@@ -207,10 +222,10 @@
             $('#calendar').fullCalendar('gotoDate', date);
         if (view.name != tmpView)
             $('#calendar').fullCalendar('changeView', tmpView);
-        
+
         // Fullcalendar Event filtering, checkbox state taken in account by calendar load
         calEventFilter();
-        
+
         // Legend button
             $("#legend").on("hide.bs.collapse", function(){
                 $(".btn").html('Afficher la légende <span class="glyphicon glyphicon-plus"></span>');
@@ -218,7 +233,7 @@
             $("#legend").on("show.bs.collapse", function(){
                 $(".btn").html('Masquer la légende <span class="glyphicon glyphicon-minus"></span>');
             });
-        
+
         // Autocomplete
         $(function() {
             $("#auto").autocomplete({
@@ -229,17 +244,17 @@
                 }
             });
         });
-        
+
     });
-    
+
     $('[data-toggle="popover"]').popover();
-    
+
     // Fullcalendar Event filtering
     $("#e{{ Auth::user()->eventtypesReadable()->implode('id',', #e') }}").change(function() {
     // $("#e1, #e2, #e3, #e4").change(function() {
         calEventFilter();
     });
-    
+
     if(calendar) {
         $(window).resize(function() {
             $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
@@ -249,7 +264,26 @@
         //    $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
         //});
     };
-    
+
+    // fulltextSearch
+    $(function() {
+        function log(message) {
+            $( "<div>" ).text( message ).prependTo("#log");
+            $( "#log" ).scrollTop(0);
+        }
+
+        $( "#event" ).autocomplete({
+            source: "eventfulltext",
+            minLength: 2,
+            select: function( event, ui ) {
+              var url = "{{ url('/events/') }}" + '/' + ui.item.value;
+              console.log(url);
+              $(location).attr('href',url);
+              // log( "Selected: " + ui.item.value + " aka " + ui.item.label );
+            }
+        });
+    });
+
 </script>
 
 <div id="loading" class="modal"><!-- Place at bottom of page --></div>

@@ -419,4 +419,24 @@ class EventController extends Controller
 
         return $result;
     }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    // Appelé par: Ajouter un événement
+    public function event_fulltextsearch(Request $request)
+    {
+        $events = Event::search($request->input('term'))->get();
+        $ui = array();
+
+        foreach($events as $event)
+        {
+           array_push($ui, (object) array('label' => $event->title, 'value' => $event->id));
+        }
+        return $ui;
+
+    }
 }
