@@ -199,7 +199,7 @@ class SlotController extends Controller
 
     public function ical($key,$username)
     {
-      
+
         $eventtypes = User::where('username','=',$username)->firstOrFail()->eventtypesReadable()->pluck('id');
 
         $slots = Slot::whereHas('event', function($query) use ($eventtypes) {
