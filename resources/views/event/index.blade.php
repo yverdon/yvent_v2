@@ -8,20 +8,7 @@
             <li class="active">Vous êtes ici: {{ $page_title }}</li>
         </ol>
     </div>
-    <div id="fulltextSearch">
-      <div class="ui-widget">
-        <label for="event">Mot-clef: </label>
-        <input id="event">
-        <div class="ui-widget" style="margin-top:2em; font-family:Arial">
-      Result:
-      <div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
-    </div>
-      <div id="eventSearchResult" style="width:300px,height:200px;background-color:blue">
-          toto
-      </div>
-    </div>
 </div>
-
 <h1>{{ $page_title }}</h1>
 
 <div class="row">
@@ -29,8 +16,6 @@
         <div id='calendar'></div>
     </div>
 </div>
-
-
 
 <!-- Fullcalendar Event filtering -->
 <div class="row">
@@ -75,46 +60,46 @@
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/locale-all.js"></script>
 <script type="text/javascript">
 
-    //Fullcalendar Event filtering
-    var curSource = new Array();
-    //sources definition
-    @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-        curSource[{{ $eventtypeid }}] = '{{ url('/') }}/api2/{{ $eventtypeid }}';
-    @endforeach
-    var newSource = new Array(); //we'll use this later
-
-    function calAspectRatio() {
-        if ($(window).width() > 480) {
-            return 1.35;
-            }
-        else {
-            return 1;
-        }
-    }
-
-    // Fullcalendar Event filtering, calendar refresh
-    function calEventFilter() {
-        //get current status of our filters into newSource
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            newSource[{{ $eventtypeid }}] = $('#e{{ $eventtypeid }}').is(':checked') ? '{{ url('/') }}/api2/{{ $eventtypeid }}' : '';
-        @endforeach
-
-        //remove the old eventSources
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            $('#calendar').fullCalendar('removeEventSource', curSource[{{ $eventtypeid }}]);
-        @endforeach
-
-        //attach the new eventSources
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            $('#calendar').fullCalendar('addEventSource', newSource[{{ $eventtypeid }}]);
-        @endforeach
-
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            curSource[{{ $eventtypeid }}] = newSource[{{ $eventtypeid }}];
-        @endforeach
-    }
-
     $(document).ready(function() {
+
+          //Fullcalendar Event filtering
+          var curSource = new Array();
+          //sources definition
+          @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+              curSource[{{ $eventtypeid }}] = '{{ url('/') }}/api2/{{ $eventtypeid }}';
+          @endforeach
+          var newSource = new Array(); //we'll use this later
+
+          function calAspectRatio() {
+              if ($(window).width() > 480) {
+                  return 1.35;
+                  }
+              else {
+                  return 1;
+              }
+          }
+
+          // Fullcalendar Event filtering, calendar refresh
+          function calEventFilter() {
+              //get current status of our filters into newSource
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  newSource[{{ $eventtypeid }}] = $('#e{{ $eventtypeid }}').is(':checked') ? '{{ url('/') }}/api2/{{ $eventtypeid }}' : '';
+              @endforeach
+
+              //remove the old eventSources
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  $('#calendar').fullCalendar('removeEventSource', curSource[{{ $eventtypeid }}]);
+              @endforeach
+
+              //attach the new eventSources
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  $('#calendar').fullCalendar('addEventSource', newSource[{{ $eventtypeid }}]);
+              @endforeach
+
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  curSource[{{ $eventtypeid }}] = newSource[{{ $eventtypeid }}];
+              @endforeach
+          }
 
         var base_url = '{{ url('/') }}';
 
@@ -156,18 +141,14 @@
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                //right: 'month,agendaWeek,listDay,listWeek,listMonth,listYear'
                 right: calViews
             },
-            // customize the button names,
-            // otherwise they'd all just say "list"
             views: calViewsTitles,
             allDaySlot: false,
             editable: false,
             locale: 'fr',
             aspectRatio: calAspectRatio(),
-            eventLimit: true, // allow "more" link when too many events
-
+            eventLimit: true,
             eventSources: [],
 
             eventMouseover: function(calEvent, jsEvent) {
@@ -198,8 +179,6 @@
                     $("#loading").removeClass("loading");
                 }
             },
-
-            // keep history : set calendar options before displaying
             year: tmpYear,
             month: tmpMonth,
             day: tmpDay,
@@ -211,10 +190,8 @@
                         ) + '&day=' + moment.format('DD') + '&view=' + view.name;
                 }
             }
-
         });
 
-        // keep history
         var date = new Date(tmpYear, tmpMonth, tmpDay, 0, 0, 0);
         var moment = $('#calendar').fullCalendar('getDate');
         var view = $('#calendar').fullCalendar('getView');
@@ -227,62 +204,28 @@
         calEventFilter();
 
         // Legend button
-            $("#legend").on("hide.bs.collapse", function(){
-                $(".btn").html('Afficher la légende <span class="glyphicon glyphicon-plus"></span>');
-            });
-            $("#legend").on("show.bs.collapse", function(){
-                $(".btn").html('Masquer la légende <span class="glyphicon glyphicon-minus"></span>');
-            });
-
-        // Autocomplete
-        $(function() {
-            $("#auto").autocomplete({
-                source: "getdata",
-                minLength: 1,
-                select: function( event, ui ) {
-                    $('#response').val(ui.item.id);
-                }
-            });
+        $("#legend").on("hide.bs.collapse", function(){
+            $(".btn").html('Afficher la légende <span class="glyphicon glyphicon-plus"></span>');
         });
+        $("#legend").on("show.bs.collapse", function(){
+            $(".btn").html('Masquer la légende <span class="glyphicon glyphicon-minus"></span>');
+        });
+
+        $('[data-toggle="popover"]').popover();
+
+        // Fullcalendar Event filtering
+        $("#e{{ Auth::user()->eventtypesReadable()->implode('id',', #e') }}").change(function() {
+            calEventFilter();
+        });
+
+        if(calendar) {
+            $(window).resize(function() {
+                $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
+            });
+        };
 
     });
 
-    $('[data-toggle="popover"]').popover();
-
-    // Fullcalendar Event filtering
-    $("#e{{ Auth::user()->eventtypesReadable()->implode('id',', #e') }}").change(function() {
-    // $("#e1, #e2, #e3, #e4").change(function() {
-        calEventFilter();
-    });
-
-    if(calendar) {
-        $(window).resize(function() {
-            $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
-        });
-        // Need jQuery Mobile
-        //$(window).orientationchange( function() {
-        //    $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
-        //});
-    };
-
-    // fulltextSearch
-    $(function() {
-        function log(message) {
-            $( "<div>" ).text( message ).prependTo("#log");
-            $( "#log" ).scrollTop(0);
-        }
-
-        $( "#event" ).autocomplete({
-            source: "eventfulltext",
-            minLength: 2,
-            select: function( event, ui ) {
-              var url = "{{ url('/events/') }}" + '/' + ui.item.value;
-              console.log(url);
-              $(location).attr('href',url);
-              // log( "Selected: " + ui.item.value + " aka " + ui.item.label );
-            }
-        });
-    });
 
 </script>
 

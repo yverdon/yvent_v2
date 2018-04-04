@@ -40,14 +40,6 @@ class EventController extends Controller
     {
         $events = Event::where('eventtype_id','=',$eventtype)->get()->sortBy('starting_date');
 
-        $events2 = DB::table('events')
-            ->select('events.*')
-            ->leftJoin('slots', 'events.id', '=', 'slots.event_id')
-            ->addSelect(DB::raw('MIN(slots.start_time) as starting_date'))
-            ->groupBy('events.id')
-            ->orderBy('starting_date', 'asc')
-            ->paginate(10);
-
         foreach($events as $event)
         {
 
@@ -434,7 +426,11 @@ class EventController extends Controller
 
         foreach($events as $event)
         {
-           array_push($ui, (object) array('label' => $event->title, 'value' => $event->id));
+           array_push($ui, (object) array(
+              'label' => $event->title,
+              'value' => $event->id,
+              'last_update' => $event->updated_at->format("d.m.Y")
+            ));
         }
         return $ui;
 

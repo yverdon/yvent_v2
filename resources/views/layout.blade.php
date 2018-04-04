@@ -14,6 +14,8 @@
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{url('css/yverdon')}}/fulltextsearch.css">
+
 
     <!-- Custom styles for this template -->
     <link href="{{ url('_asset/css') }}/style.css" rel="stylesheet">
@@ -36,7 +38,17 @@
           <a class="navbar-brand" href="{{ url('/') }}"><i class="fa fa-calendar"></i> YVENT</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
+          <form class="navbar-form navbar-left">
+            <div class="form-group">
+              <input id="eventFulltextSearch" type="text" class="form-control" placeholder="Rechercher...">
+            </div>
+          </form>
           <ul class="nav navbar-nav navbar-right">
+            <!-- <li>
+              <div>
+                <input id="eventFulltextSearch" placeholder="Rechercher un événement...">
+              </div>
+            </li> -->
             <!-- Authentication Links -->
             <?php //@if (Auth::guest()) ?>
             @if (Auth::guest())
@@ -123,7 +135,30 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-    <script src="{{ url('_asset/fullcalendar/lib') }}/moment.min.js"></script>
+    <script src="{{url('_asset/fullcalendar/lib')}}/moment.min.js"></script>
+    <script>
+      $(document).ready(function() {
+
+          // fulltextSearch
+          $(function() {
+            var urlft = "{{ url('/') }}" + '/eventfulltext';
+              $("#eventFulltextSearch").autocomplete({
+                  source: urlft,
+                  minLength: 2,
+                  select: function(event, ui) {
+                    event.preventDefault();
+                    var url = "{{ url('/') }}" + '/events/' + ui.item.value;
+                    $("#eventFulltextSearch").val('');
+                    $(location).attr('href',url);
+                  }
+                }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+                  return $( "<li>" )
+                    .append( "<div>" + item.label + " - " + item.last_update + "</div>" )
+                    .appendTo( ul );
+                };
+          });
+      });
+  </script>
 
 
     @yield('js')

@@ -16,13 +16,13 @@ return [
     */
     'tntsearch' => [
           'storage'  => storage_path('/searchindex'), //place where the index files will be stored
-          'fuzziness' => env('TNTSEARCH_FUZZINESS', false),
+          'fuzziness' => env('TNTSEARCH_FUZZINESS', true),
           'fuzzy' => [
               'prefix_length' => 2,
               'max_expansions' => 50,
               'distance' => 2
           ],
-          'asYouType' => false,
+          'asYouType' => true,
           'searchBoolean' => env('TNTSEARCH_BOOLEAN', false),
       ],
 
