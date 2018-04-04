@@ -59,50 +59,50 @@
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/fullcalendar.min.js"></script>
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/locale-all.js"></script>
 <script type="text/javascript">
-    
-    //Fullcalendar Event filtering
-    var curSource = new Array();
-    //sources definition
-    @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-        curSource[{{ $eventtypeid }}] = '{{ url('/') }}/api2/{{ $eventtypeid }}';
-    @endforeach
-    var newSource = new Array(); //we'll use this later
-    
-    function calAspectRatio() {
-        if ($(window).width() > 480) {
-            return 1.35;
-            }
-        else {
-            return 1;
-        }
-    }
-    
-    // Fullcalendar Event filtering, calendar refresh
-    function calEventFilter() {
-        //get current status of our filters into newSource
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            newSource[{{ $eventtypeid }}] = $('#e{{ $eventtypeid }}').is(':checked') ? '{{ url('/') }}/api2/{{ $eventtypeid }}' : '';
-        @endforeach
 
-        //remove the old eventSources
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            $('#calendar').fullCalendar('removeEventSource', curSource[{{ $eventtypeid }}]);
-        @endforeach
-
-        //attach the new eventSources
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            $('#calendar').fullCalendar('addEventSource', newSource[{{ $eventtypeid }}]);
-        @endforeach
-
-        @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
-            curSource[{{ $eventtypeid }}] = newSource[{{ $eventtypeid }}];
-        @endforeach
-    }
-    
     $(document).ready(function() {
-        
+
+          //Fullcalendar Event filtering
+          var curSource = new Array();
+          //sources definition
+          @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+              curSource[{{ $eventtypeid }}] = '{{ url('/') }}/api2/{{ $eventtypeid }}';
+          @endforeach
+          var newSource = new Array(); //we'll use this later
+
+          function calAspectRatio() {
+              if ($(window).width() > 480) {
+                  return 1.35;
+                  }
+              else {
+                  return 1;
+              }
+          }
+
+          // Fullcalendar Event filtering, calendar refresh
+          function calEventFilter() {
+              //get current status of our filters into newSource
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  newSource[{{ $eventtypeid }}] = $('#e{{ $eventtypeid }}').is(':checked') ? '{{ url('/') }}/api2/{{ $eventtypeid }}' : '';
+              @endforeach
+
+              //remove the old eventSources
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  $('#calendar').fullCalendar('removeEventSource', curSource[{{ $eventtypeid }}]);
+              @endforeach
+
+              //attach the new eventSources
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  $('#calendar').fullCalendar('addEventSource', newSource[{{ $eventtypeid }}]);
+              @endforeach
+
+              @foreach(Auth::user()->eventtypesReadable()->pluck('id') as $eventtypeid)
+                  curSource[{{ $eventtypeid }}] = newSource[{{ $eventtypeid }}];
+              @endforeach
+          }
+
         var base_url = '{{ url('/') }}';
-        
+
         // keep history : set default values
         var today = new Date();
         var tmpYear = today.getFullYear();
@@ -117,7 +117,7 @@
           if (vars[i].match("^day")) tmpDay = vars[i].substring(4);
           if (vars[i].match("^view")) tmpView = vars[i].substring(5);
         }
-        
+
         if ($(window).width() > 480) {
             calViews = 'month,listWeek,listMonth,listYear';
             calViewsTitles = {
@@ -135,26 +135,22 @@
                 listMonth: { buttonText: 'Mois' },
             }
         }
-        
+
         $('#calendar').fullCalendar({
             weekends: true,
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                //right: 'month,agendaWeek,listDay,listWeek,listMonth,listYear'
                 right: calViews
             },
-            // customize the button names,
-            // otherwise they'd all just say "list"
             views: calViewsTitles,
             allDaySlot: false,
             editable: false,
             locale: 'fr',
             aspectRatio: calAspectRatio(),
-            eventLimit: true, // allow "more" link when too many events
-            
+            eventLimit: true,
             eventSources: [],
-            
+
             eventMouseover: function(calEvent, jsEvent) {
                 var startDate = calEvent.start.format('ddd DD.MM.YYYY HH:mm');
                 var endDate = calEvent.end.format('ddd DD.MM.YYYY HH:mm');
@@ -175,7 +171,7 @@
                 $(this).css('z-index', 8);
                 $('.tooltipevent').remove();
             },
-            
+
             loading: function(isLoading, view) {
                 if (isLoading) {// isLoading gives boolean value
                     $("#loading").addClass("loading");
@@ -183,8 +179,6 @@
                     $("#loading").removeClass("loading");
                 }
             },
-            
-            // keep history : set calendar options before displaying
             year: tmpYear,
             month: tmpMonth,
             day: tmpDay,
@@ -196,10 +190,8 @@
                         ) + '&day=' + moment.format('DD') + '&view=' + view.name;
                 }
             }
-            
         });
-        
-        // keep history
+
         var date = new Date(tmpYear, tmpMonth, tmpDay, 0, 0, 0);
         var moment = $('#calendar').fullCalendar('getDate');
         var view = $('#calendar').fullCalendar('getView');
@@ -207,49 +199,34 @@
             $('#calendar').fullCalendar('gotoDate', date);
         if (view.name != tmpView)
             $('#calendar').fullCalendar('changeView', tmpView);
-        
+
         // Fullcalendar Event filtering, checkbox state taken in account by calendar load
         calEventFilter();
-        
+
         // Legend button
-            $("#legend").on("hide.bs.collapse", function(){
-                $(".btn").html('Afficher la légende <span class="glyphicon glyphicon-plus"></span>');
-            });
-            $("#legend").on("show.bs.collapse", function(){
-                $(".btn").html('Masquer la légende <span class="glyphicon glyphicon-minus"></span>');
-            });
-        
-        // Autocomplete
-        $(function() {
-            $("#auto").autocomplete({
-                source: "getdata",
-                minLength: 1,
-                select: function( event, ui ) {
-                    $('#response').val(ui.item.id);
-                }
-            });
+        $("#legend").on("hide.bs.collapse", function(){
+            $(".btn").html('Afficher la légende <span class="glyphicon glyphicon-plus"></span>');
         });
-        
-    });
-    
-    $('[data-toggle="popover"]').popover();
-    
-    // Fullcalendar Event filtering
-    $("#e{{ Auth::user()->eventtypesReadable()->implode('id',', #e') }}").change(function() {
-    // $("#e1, #e2, #e3, #e4").change(function() {
-        calEventFilter();
-    });
-    
-    if(calendar) {
-        $(window).resize(function() {
-            $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
+        $("#legend").on("show.bs.collapse", function(){
+            $(".btn").html('Masquer la légende <span class="glyphicon glyphicon-minus"></span>');
         });
-        // Need jQuery Mobile
-        //$(window).orientationchange( function() {
-        //    $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
-        //});
-    };
-    
+
+        $('[data-toggle="popover"]').popover();
+
+        // Fullcalendar Event filtering
+        $("#e{{ Auth::user()->eventtypesReadable()->implode('id',', #e') }}").change(function() {
+            calEventFilter();
+        });
+
+        if(calendar) {
+            $(window).resize(function() {
+                $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
+            });
+        };
+
+    });
+
+
 </script>
 
 <div id="loading" class="modal"><!-- Place at bottom of page --></div>

@@ -6,6 +6,7 @@
 /.idea
 /.vscode
 /.vagrant
+/storage/searchindex/*.index
 Homestead.json
 Homestead.yaml
 npm-debug.log

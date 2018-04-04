@@ -180,9 +180,11 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
-        
+
         App\Providers\ShaHashServiceProvider::class,
-        App\Providers\HelperServiceProvider::class, 
+        App\Providers\HelperServiceProvider::class,
+        Laravel\Scout\ScoutServiceProvider::class,
+        TeamTNT\Scout\TNTSearchScoutServiceProvider::class
 
     ],
 

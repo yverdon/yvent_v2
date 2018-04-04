@@ -2,11 +2,15 @@
 
 namespace App;
 
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
 {
+
+		use Searchable;
+
     public function eventtype()
     {
         return $this->belongsTo('App\Eventtype');
@@ -67,12 +71,4 @@ class Event extends Model
     {
         return $this->slots->max('end_time');
     }
-
-    // use SoftDeletes;
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    // protected $dates = ['deleted_at'];
 }

@@ -74,3 +74,6 @@ Route::get('/rues', 'ADR_axeController@index');
 
 // Investments
 Route::get('/pi', 'InvestmentController@index');
+
+// Event TNT fulltextSearch
+Route::get('/eventfulltext', 'EventController@event_fulltextsearch');
