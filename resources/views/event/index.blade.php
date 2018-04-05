@@ -10,6 +10,15 @@
     </div>
 </div>
 <h1>{{ $page_title }}</h1>
+<div>
+<label for="decision_date">Accès direct à une date</label>
+<div class="input-group">
+    <input id="monthPicker" type="text" class="form-control" name="monthpicker">
+    <span class="input-group-addon">
+        <span class="glyphicon glyphicon-calendar"></span>
+    </span>
+</div>
+</div>
 
 <div class="row">
     <div class="col-lg-12">
@@ -58,7 +67,9 @@
 @section('js')
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/fullcalendar.min.js"></script>
 <script src="{{ url('_asset/fullcalendar-3.1.0') }}/locale-all.js"></script>
-<script type="text/javascript">
+<script src="{{ url('_asset/js') }}/daterangepicker.js"></script>
+
+<script defer type="text/javascript">
 
     $(document).ready(function() {
 
@@ -223,6 +234,23 @@
                 $('#calendar').fullCalendar('option', 'aspectRatio', calAspectRatio());
             });
         };
+
+        var today = new Date();
+        var maxDate = today.getDate().toString() + '/' + (today.getMonth() + 1).toString() + '/' + (today.getFullYear() + 10).toString();
+        $(function() {
+          $('#monthPicker').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            minDate: '01/01/2016',
+            maxDate: maxDate,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+          },
+          function(start, end, label) {
+              $('#calendar').fullCalendar('gotoDate', start);
+          });
+        });
 
     });
 
