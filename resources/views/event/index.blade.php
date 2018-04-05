@@ -44,6 +44,9 @@
     <div class="col-lg-1">
         <a href="#" data-toggle="popover" title="Calendrier au format ICS (iCal). A copier et utiliser dans Outlook." data-content="{{ url('') }}/ical/{{ Auth::user()->key }}/yvent_{{ Auth::user()->username }}.ics"><img src="{{ url('_asset') }}/ics.png" alt="ICS"></a>
     </div>
+    <div class="col-lg-1">
+      <a id="csvExport" href="#" class="btn btn-info" role="button"><span class="glyphicon glyphicon-th-list"></span> Export CSV</a>
+    </div>
 </div>
 <div class="row">
     <div class="col-lg-2">
@@ -188,6 +191,7 @@
                     $("#loading").addClass("loading");
                 } else {
                     $("#loading").removeClass("loading");
+                    prepareCSV();
                 }
             },
             year: tmpYear,
@@ -251,6 +255,27 @@
               $('#calendar').fullCalendar('gotoDate', start);
           });
         });
+
+        var prepareCSV = function() {
+
+          var  d = $('#calendar').fullCalendar('clientEvents');
+          var csv = 'event_id\ttitle\tlocation\tstart_time\tend_time\n';
+          var datstr = today.getDate().toString() + '_' + (today.getMonth() + 1).toString() + '_' + (today.getFullYear()).toString();
+          var filename = 'yvent_export_' + datstr + '.txt';
+
+          for (var i=0; i<d.length; i++) {
+            csv += d[i].event_id + '\t' + d[i].title + '\t' + d[i].location + '\t' + d[i].start_time + '\t' + d[i].end_time + '\n';
+          }
+
+          var blob = new Blob([csv], {
+            "type": "text/string;charset=utf-8;"
+          });
+
+          var link = $("#csvExport");
+          link.attr("href", window.URL.createObjectURL(blob));
+          link.attr("download", filename);
+
+        };
 
     });
 
