@@ -18,8 +18,9 @@ services:
       build: phpdocker/php-fpm
       container_name: docker-yvent-php-fpm
       working_dir: /application
-      #command: bash -c 'composer install'
       volumes:
         - .:/application
         - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
+      extra_hosts:
+        - "localhost:192.168.56.1"
 
