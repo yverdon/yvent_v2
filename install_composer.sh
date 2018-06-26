@@ -1,0 +1,1 @@
+docker-compose run php-fpm composer install
