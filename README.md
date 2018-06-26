@@ -41,6 +41,12 @@ docker-compose build
 docker-compose run php-fpm composer install
 ```
 
+* grant right on storage folder to www-data user*
+```
+chmod -R a+rw storage/
+```
+
+
 *start the app:*
 docker-compose up
 
