@@ -37,11 +37,14 @@
           <a class="navbar-brand" href="{{ url('/') }}"><i class="fa fa-calendar"></i> YVENT</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
+          @if (Auth::check())
           <form class="navbar-form navbar-left">
             <div class="form-group">
               <input id="eventFulltextSearch" type="text" class="form-control" placeholder="Rechercher...">
             </div>
           </form>
+          @endif
+
           <ul class="nav navbar-nav navbar-right">
             <!-- Authentication Links -->
             <?php //@if (Auth::guest()) ?>
