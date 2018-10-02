@@ -26,11 +26,10 @@ docker-compose build .
 docker-compose up
 ```
 
-*Calling php artisan/composer inside the composer can be done the following way*
+*Cheatsheet: execute command in container*
 
 ```
-docker-compose run yvent composer install
-docker-compose run yvent php artisan serve
+docker-compose exec php-fpm bash
 ```
 
 *build the app:*
