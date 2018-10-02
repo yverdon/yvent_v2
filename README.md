@@ -51,6 +51,7 @@ docker-compose up
 
 *Update tntsearch index*
 
+Dont' forget that scout needs a directory with rw rights...
 
 ```
 docker-compose run php-fpm ./artisan scout:import App\\Event
@@ -94,14 +95,9 @@ RewriteBase /custom_yvent/
 php artisan serve
 ```
 
-Logon with:
-
-> User: masrad
-> Pwd: masrad
-
 ## Troubleshooting
 
-Be sure Composer is using the right PHP (at least PHP 7.0)
+Be sure Composer is using the right PHP (at least PHP 7.2)
 
 In Windows, if you get PDO exception on attempt to login, you're probably not using postgres driver for PHP.
 You should uncomment the line containing `php_pdo_pgsql.dll` in the php.ini file.
