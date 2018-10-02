@@ -53,7 +53,7 @@ docker-compose up
 
 
 ```
-docker-compose run yvent php artisan scout:import App\\Event
+docker-compose run php-fpm ./artisan scout:import App\\Event
 ```
 
 ## NON-DOCKER
