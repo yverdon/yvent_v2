@@ -51,7 +51,7 @@ docker-compose up
 
 *Update tntsearch index*
 
-Dont' forget that scout needs a directory with rw rights...
+Don't forget that scout needs a directory with rw rights...
 
 ```
 docker-compose run php-fpm ./artisan scout:import App\\Event
